@@ -143,6 +143,35 @@ class Parser(object):
         ("(tm)", "&trade;"),
     )
 
+    MAX_REPLACEMENT = 200
+
+    ENTITIES = (
+    ( 'é', '&eacute;'),
+    ( 'è', '&egrave;'),
+    ( 'ê', '&ecirc;'),
+    ( 'ë', '&euml;'),
+    ( 'á', '&aacute;'),
+    ( 'à', '&agrave;'),
+    ( 'â', '&acirc;'),
+    ( 'ä', '&auml;'),
+
+    ( 'ú', '&uacute;'),
+    ( 'ù', '&ugrave;'),
+    ( 'û', '&ucirc;'),
+    ( 'ü', '&uuml;'),
+
+    ( 'ø', '&oslash;'),
+    ( 'ý', '&yacute;'),
+    ( 'þ', '&thorn;'),
+    ( 'ÿ', '&yuml;'),
+    ( '¦', '&brvbar;'),
+    ( '§', '&sect;' ),
+
+    ( '·', '&middot;'),
+    ( '©', '&copy;'),
+    ( '®', '&reg;'),
+    )
+
     def __init__(
         self,
         newline="<br />",
@@ -675,7 +704,11 @@ class Parser(object):
         tokens = self.tokenize(data)
         full_context = self.default_context.copy()
         full_context.update(context)
-        return self._format_tokens(tokens, None, **full_context).replace("\r", self.newline)
+        _html = self._format_tokens(tokens, None, **full_context).replace("\r", self.newline)
+        for (k, subs) in Parser.ENTITIES:
+            _html = _html.replace(k, subs, Parser.MAX_REPLACEMENT)
+
+        return _html
 
     def strip(self, data, strip_newlines=False):
         """

@@ -233,6 +233,11 @@ class ParserTests(unittest.TestCase):
 
     def test_unicode(self):
         src = "[center]ƒünk¥ • §tüƒƒ[/center]"
+        dst = '<div style="text-align:center;">ƒ&uuml;nk¥ • &sect;t&uuml;ƒƒ</div>'
+        self.assertEqual(self.parser.format(src), dst)
+
+    def unicode_not_replaced(self):
+        src = "[center]ƒünk¥ • §tüƒƒ[/center]"
         dst = '<div style="text-align:center;">ƒünk¥ • §tüƒƒ</div>'
         self.assertEqual(self.parser.format(src), dst)
 
@@ -267,5 +272,28 @@ class ParserTests(unittest.TestCase):
         self.assertEqual(html, "<strong>hello</strong> <em>world</em>")
 
 
+    def test_convert_non_ascii_to_HTML_entities (self):
+        html = bbcode.render_html("épiphénomène")
+        self.assertEqual(html, "&eacute;piph&eacute;nom&egrave;ne")
+
+    def test_all_french_accent(self):
+        self.maxDiff=None
+        html = bbcode.render_html("Candide s'enfuit au plus vite dans un autre village : il appartenait à des Bulgares, "
+        + "et des héros abares l'avaient traité de même. Candide, toujours marchant sur des membres palpitants ou à travers "
+        + "des ruines, arriva enfin hors du théâtre de la guerre, portant quelques petites provisions dans son bissac, et "
+        + "n'oubliant jamais Mlle Cunégonde. Ses provisions lui manquèrent quand il fut en Hollande ; mais ayant entendu "
+        + "dire que tout le monde était riche dans ce pays-là, et qu'on y était chrétien , il ne douta pas qu'on ne le "
+        + "traitat aussi bien qu'il l'avait été dans le château de monsieur le baron avant qu'il en eût été chassé pour "
+        + "les beaux yeux de Mlle Cunégonde")
+
+        self.assertEqual(html, "Candide s&#39;enfuit au plus vite dans un autre village : il appartenait &agrave; des Bulgares, "
+        + "et des h&eacute;ros abares l&#39;avaient trait&eacute; de m&ecirc;me. Candide, toujours marchant sur des membres palpitants ou &agrave; travers "
+        + "des ruines, arriva enfin hors du th&eacute;&acirc;tre de la guerre, portant quelques petites provisions dans son bissac, et "
+        + "n&#39;oubliant jamais Mlle Cun&eacute;gonde. Ses provisions lui manqu&egrave;rent quand il fut en Hollande ; mais ayant entendu "
+        + "dire que tout le monde &eacute;tait riche dans ce pays-l&agrave;, et qu&#39;on y &eacute;tait chr&eacute;tien , il ne douta pas qu&#39;on ne le "
+        + "traitat aussi bien qu&#39;il l&#39;avait &eacute;t&eacute; dans le ch&acirc;teau de monsieur le baron avant qu&#39;il en e&ucirc;t &eacute;t&eacute; chass&eacute; pour les "
+        + "beaux yeux de Mlle Cun&eacute;gonde")
+
 if __name__ == "__main__":
     unittest.main()
+
